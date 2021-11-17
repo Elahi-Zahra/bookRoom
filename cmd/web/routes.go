@@ -8,7 +8,7 @@ import (
 	"net/http"
 )
 
-func routes(app *config.AppConfig) http.Handler  {
+func routes(app *config.AppConfig) http.Handler {
 	mx := chi.NewRouter()
 
 	mx.Use(middleware.Recoverer)
@@ -16,7 +16,10 @@ func routes(app *config.AppConfig) http.Handler  {
 	mx.Use(SessionLoad)
 	//mx.Use(WriteToConsole)
 
-	mx.Get("/",handlers.Repo.Home)
-	mx.Get("/about",handlers.Repo.About)
+	fileServer := http.FileServer(http.Dir("./static/"))
+	mx.Handle("/static/*", http.StripPrefix("/static", fileServer))
+
+	mx.Get("/", handlers.Repo.Home)
+	mx.Get("/about", handlers.Repo.About)
 	return mx
 }
